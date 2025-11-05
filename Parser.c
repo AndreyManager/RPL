@@ -18,10 +18,6 @@ typedef struct{
     unsigned int LenTokens;
     Token* Tokens;
     Dictionary* DictionaryVariable;
-    Dictionary* ValueInt;
-    Dictionary* ValueFloat;
-    Dictionary* ValueBool;
-    Dictionary* ValueChar;
 }Parser;
 
 
@@ -49,12 +45,8 @@ void ParserInit(Parser* parser, unsigned int lenTokens, Token* tokens){
     parser->Tokens = tokens;
     parser->LenTokens = lenTokens;
     parser->DictionaryVariable = malloc(sizeof(Dictionary));
-    parser->ValueInt = malloc(sizeof(Dictionary));
-    parser->ValueFloat = malloc(sizeof(Dictionary));
-    parser->ValueBool = malloc(sizeof(Dictionary));
-    parser->ValueChar = malloc(sizeof(Dictionary));
     ThrowParser(parser, parser->DictionaryVariable == NULL, parser->Pos, "Dic malloc error");
-    unsigned int maxNames = 0;
+    int maxNames = 0;
     for(unsigned int i = 1; i < lenTokens; i++){
         if(IsEqStr(tokens[i].Type.Name, tokenType[12].Name) == 1){
             maxNames++;
@@ -65,7 +57,7 @@ void ParserInit(Parser* parser, unsigned int lenTokens, Token* tokens){
     unsigned int isInNames = 1;
     for(unsigned int i = 2; i < lenTokens; i++){
         if(IsEqStr(tokens[i].Type.Name, tokenType[12].Name) == 1){
-            if(IsEqStr(tokens[i-1].Type.Name, tokenType[24].Name) == 1){
+            if(IsEqStr(tokens[i-1].Type.Name, tokenType[20].Name) == 1){
                 for(unsigned int ind = 0; ind < maxVariable; ind++){
                     if(IsEqStr(names[ind].word, tokens[i-1].Code) == 1){
                         isInNames = 0;
@@ -87,13 +79,9 @@ void ParserInit(Parser* parser, unsigned int lenTokens, Token* tokens){
     IntTo(fv, -1);
 
     DicInit(parser->DictionaryVariable, maxVariable, 0, "r", fv);
-    DicInit(parser->ValueInt, maxVariable, 0, "r", fv);
-    DicInit(parser->ValueFloat, maxVariable, 1, "r", fv);
-    DicInit(parser->ValueBool, maxVariable, 2, "r", fv);
-    DicInit(parser->ValueChar, maxVariable, 3, "r", fv);
 }
 
-Token* GetToken(Parser* parser, unsigned int len, TokenType* types){
+Token* GetCurrentTokenIfIn(Parser* parser, unsigned int len, TokenType* types){
     if(parser->Pos < parser->LenTokens){
         Token* currentToken = malloc(sizeof(Token));
         ThrowParser(parser, currentToken == NULL, parser->Pos, "Token malloc error");
@@ -114,7 +102,7 @@ Token* GetToken(Parser* parser, unsigned int len, TokenType* types){
 }
 
 void Requier(Parser* parser, unsigned int len, TokenType* types){
-    Token* token = GetToken(parser, len, types);
+    Token* token = GetCurrentTokenIfIn(parser, len, types);
     if(token == NULL){
         ThrowParser(parser, 1, parser->Pos, "Requier error");
         return;
@@ -132,10 +120,10 @@ int GetLabel(Parser* parser, unsigned int Pos ){
     return numberString;
 }
 
-ExpressionNode* ParsePerentheses(Parser* parser);
+ExpressionNode* ParseParentheses(Parser* parser);
 
 ExpressionNode* ParseFormula(Parser* parser){
-    ExpressionNode* leftNode = ParsePerentheses(parser);
+    ExpressionNode* leftNode = ParseParentheses(parser);
     TokenType types[] = {tokenType[4],
                          tokenType[5],
                          tokenType[6],
@@ -143,10 +131,10 @@ ExpressionNode* ParseFormula(Parser* parser){
                          tokenType[8],
                          tokenType[9],
                          tokenType[10],
-                         tokenType[11],};
-    Token* operation = GetToken(parser, 8, &types);
+                         tokenType[11]};
+    Token* operation = GetCurrentTokenIfIn(parser, 8, &types);
     while(operation != NULL){
-        ExpressionNode* rightNode = ParsePerentheses(parser);
+        ExpressionNode* rightNode = ParseParentheses(parser);
         BinOperationNode* bin = malloc(sizeof(BinOperationNode));
         ThrowParser(parser, bin == NULL, parser->Pos, "Bin malloc error");
         bin->LNode = malloc(sizeof(ExpressionNode));
@@ -154,13 +142,13 @@ ExpressionNode* ParseFormula(Parser* parser){
         ENInit(bin->LNode, leftNode->ID, leftNode->Node);
         BONInit(bin, bin->LNode, operation, rightNode);
         ENInit(leftNode, 3, bin);
-        operation = GetToken(parser, 8, &types);
+        operation = GetCurrentTokenIfIn(parser, 8, &types);
     }
     return leftNode;
 }
 
 ExpressionNode* ParseVariableOrNumberOrOperation(Parser* parser){
-    Token* token = GetToken(parser, 1, &tokenType[15]);
+    Token* token = GetCurrentTokenIfIn(parser, 1, &tokenType[15]);
     if (token != NULL){
         Number* var = malloc(sizeof(Number));
         ThrowParser(parser, var == NULL, parser->Pos, "Number malloc error");
@@ -170,7 +158,7 @@ ExpressionNode* ParseVariableOrNumberOrOperation(Parser* parser){
         ENInit(node, 0, var);
         return node;
     }
-    token = GetToken(parser, 1, &tokenType[16]);
+    token = GetCurrentTokenIfIn(parser, 1, &tokenType[16]);
     if (token != NULL){
         Number* var = malloc(sizeof(Number));
         ThrowParser(parser, var == NULL, parser->Pos, "Number malloc error");
@@ -180,7 +168,7 @@ ExpressionNode* ParseVariableOrNumberOrOperation(Parser* parser){
         ENInit(node, 0, var);
         return node;
     }
-    token = GetToken(parser, 1, &tokenType[17]);
+    token = GetCurrentTokenIfIn(parser, 1, &tokenType[17]);
     if (token != NULL){
         Number* var = malloc(sizeof(Number));
         ThrowParser(parser, var == NULL, parser->Pos, "Number malloc error");
@@ -190,7 +178,7 @@ ExpressionNode* ParseVariableOrNumberOrOperation(Parser* parser){
         ENInit(node, 0, var);
         return node;
     }
-    token = GetToken(parser, 1, &tokenType[19]);
+    token = GetCurrentTokenIfIn(parser, 1, &tokenType[19]);
     if (token != NULL){
         Number* var = malloc(sizeof(Number));
         ThrowParser(parser, var == NULL, parser->Pos, "Number malloc error");
@@ -200,7 +188,7 @@ ExpressionNode* ParseVariableOrNumberOrOperation(Parser* parser){
         ENInit(node, 0, var);
         return node;
     }
-    token = GetToken(parser, 1, &tokenType[24]);
+    token = GetCurrentTokenIfIn(parser, 1, &tokenType[20]);
     if (token != NULL){
         Variable* var = malloc(sizeof(Variable));
         ThrowParser(parser, var == NULL, parser->Pos, "Variable malloc error");
@@ -210,7 +198,7 @@ ExpressionNode* ParseVariableOrNumberOrOperation(Parser* parser){
         ENInit(node, 1, var);
         return node;
     }
-    token = GetToken(parser, 1, &tokenType[4]);
+    token = GetCurrentTokenIfIn(parser, 1, &tokenType[4]);
     if (token != NULL){
         UnarOperationNode* var = malloc(sizeof(UnarOperationNode));
         ThrowParser(parser, var == NULL, parser->Pos, "Unar malloc error");
@@ -220,7 +208,7 @@ ExpressionNode* ParseVariableOrNumberOrOperation(Parser* parser){
         ENInit(node, 2, var);
         return node;
     }
-    token = GetToken(parser, 1, &tokenType[0]);
+    token = GetCurrentTokenIfIn(parser, 1, &tokenType[0]);
     if (token != NULL){
         sprintf(token->Code, "%d", GetLabel(parser, parser->Pos));
         Number* var = malloc(sizeof(Number));
@@ -234,8 +222,8 @@ ExpressionNode* ParseVariableOrNumberOrOperation(Parser* parser){
     ThrowParser(parser, 1, parser->Pos, "ErrorValue");
 }
 
-ExpressionNode* ParsePerentheses(Parser* parser){
-    if(GetToken(parser, 1, &tokenType[13]) != NULL){
+ExpressionNode* ParseParentheses(Parser* parser){
+    if(GetCurrentTokenIfIn(parser, 1, &tokenType[13]) != NULL){
         ExpressionNode* node = ParseFormula(parser);
         Requier(parser, 1, &tokenType[14]);
         return node;
@@ -246,7 +234,7 @@ ExpressionNode* ParsePerentheses(Parser* parser){
 }
 
 ExpressionNode* ParseUnarOperation(Parser* parser, TokenType* type){
-    Token* operation = GetToken(parser, 1, type);
+    Token* operation = GetCurrentTokenIfIn(parser, 1, type);
     if (operation != NULL){
         UnarOperationNode* operationNode = malloc(sizeof(UnarOperationNode));
         ThrowParser(parser, operation == NULL, parser->Pos, "Unar malloc error");
@@ -261,7 +249,7 @@ ExpressionNode* ParseUnarOperation(Parser* parser, TokenType* type){
 
 ExpressionNode* ParseVariable(Parser* parser){
     ExpressionNode* var = ParseVariableOrNumberOrOperation(parser);
-    Token* assignOperation = GetToken(parser, 1, &tokenType[12]);
+    Token* assignOperation = GetCurrentTokenIfIn(parser, 1, &tokenType[12]);
 
     if (assignOperation != NULL){
         ExpressionNode* value = ParseFormula(parser);
@@ -273,29 +261,6 @@ ExpressionNode* ParseVariable(Parser* parser){
         ENInit(operation->LNode, var->ID, var->Node);
         BONInit(operation, operation->LNode, assignOperation, value);
 
-        ExpressionNode* node = malloc(sizeof(ExpressionNode));
-        ThrowParser(parser, node == NULL, parser->Pos, "BinNode malloc error");
-        ENInit(node, 3, operation);
-        return node;
-    }
-    printf("errorVar\n");
-}
-ExpressionNode* ParseCreateVariable(Parser* parser){
-    TokenType types[] = {tokenType[20], tokenType[21], tokenType[22], tokenType[23]};
-    Token* typeVar = GetToken(parser, sizeof(types)/sizeof(TokenType), &types);
-    ExpressionNode* var = ParseVariableOrNumberOrOperation(parser);
-    Token* assignOperation = GetToken(parser, 1, &tokenType[12]);
-
-    if (assignOperation != NULL){
-        ExpressionNode* value = ParseFormula(parser);
-        ((Variable*)(var->Node))->Type = typeVar;
-        BinOperationNode* operation = malloc(sizeof(BinOperationNode));
-        ThrowParser(parser, operation == NULL, parser->Pos, "Bin malloc error");
-        operation->LNode = malloc(sizeof(ExpressionNode));
-        ThrowParser(parser, operation->LNode == NULL, parser->Pos, "BinNode malloc error");
-        ENInit(operation->LNode, var->ID, var->Node);
-        BONInit(operation, operation->LNode, assignOperation, value);
-        
         ExpressionNode* node = malloc(sizeof(ExpressionNode));
         ThrowParser(parser, node == NULL, parser->Pos, "BinNode malloc error");
         ENInit(node, 3, operation);
@@ -304,18 +269,16 @@ ExpressionNode* ParseCreateVariable(Parser* parser){
     ThrowParser(parser, 1, parser->Pos, "ErrorVar");
 }
 
-ExpressionNode* ParseExpression(Parser* parser){
-    TokenType not[] = {tokenType[24], tokenType[3], tokenType[2], tokenType[1]};
-    if(GetToken(parser, 4, &not) == NULL){return ParseCreateVariable(parser);}
+ExpressionNode* ParseCurrentString(Parser* parser){
+    TokenType not[] = {tokenType[20], tokenType[3], tokenType[2], tokenType[1]};
+
+    if(GetCurrentTokenIfIn(parser, 3, &not) == NULL){return ParseUnarOperation(parser, &tokenType[1]);}
     parser->Pos--;
 
-    if(GetToken(parser, 3, &not) == NULL){return ParseUnarOperation(parser, &tokenType[1]);}
+    if(GetCurrentTokenIfIn(parser, 2, &not) == NULL){return ParseUnarOperation(parser, &tokenType[2]);}
     parser->Pos--;
 
-    if(GetToken(parser, 2, &not) == NULL){return ParseUnarOperation(parser, &tokenType[2]);}
-    parser->Pos--;
-
-    if(GetToken(parser, 1, &not) == NULL){return ParseUnarOperation(parser, &tokenType[3]);}
+    if(GetCurrentTokenIfIn(parser, 1, &not) == NULL){return ParseUnarOperation(parser, &tokenType[3]);}
     parser->Pos--;
 
     return ParseVariable(parser);
@@ -325,7 +288,7 @@ ExpressionNode* ParseCode(Parser* parser){
     StatementsNode* root = malloc(sizeof(StatementsNode));
     RInit(root, GetLabel(parser, parser->LenTokens-1));
     while(parser->Pos < parser->LenTokens){
-        ExpressionNode* stringNode = ParseExpression(parser);
+        ExpressionNode* stringNode = ParseCurrentString(parser);
         Requier(parser, 1, &tokenType[18]);
         Add(root, stringNode);
     }
@@ -343,27 +306,7 @@ Data* Run(Parser* parser, ExpressionNode* node){
     if(node->ID == 1){
         Variable var = *(Variable*)(node->Node);
         if (TryGetValue(parser->DictionaryVariable, var.Var->Code) == 1){
-            unsigned int types = ToInt(GetValue(parser->DictionaryVariable, var.Var->Code));
-            if (types == 0){
-                if(TryGetValue(parser->ValueInt, var.Var->Code) == 1){
-                    return GetValue(parser->ValueInt, var.Var->Code);
-                }
-            }
-            else if (types == 1){
-                if(TryGetValue(parser->ValueFloat, var.Var->Code) == 1){
-                    return GetValue(parser->ValueFloat, var.Var->Code);
-                }
-            }
-            else if (types == 2){
-                if(TryGetValue(parser->ValueBool, var.Var->Code) == 1){
-                    return GetValue(parser->ValueBool, var.Var->Code);
-                }
-            }
-            else if (types == 3){
-                if(TryGetValue(parser->ValueChar, var.Var->Code) == 1){
-                    return GetValue(parser->ValueChar, var.Var->Code);
-                }
-            }
+            return GetValue(parser->DictionaryVariable, var.Var->Code);
         }
         char m[24 + sizeof(var.Var->Code)];
         sprintf(m, "Variable %s is not created", var.Var->Code);
@@ -380,6 +323,7 @@ Data* Run(Parser* parser, ExpressionNode* node){
             else if (value->Type == 3){printf("%c", ToChar(value));}
             return NULL;
         }
+
         if(unar.operation->Type.Name == tokenType[3].Name){
             if(parser->IsCanGo == 1){
                 Data* Operand = Run(parser, unar.operand);
@@ -406,14 +350,8 @@ Data* Run(Parser* parser, ExpressionNode* node){
         if(unar.operation->Type.Name == tokenType[4].Name){
             Data* Operand = Run(parser, unar.operand);
             Data* result = malloc(sizeof(Data));
-            if (Operand->Type == 1){
-                DataInit(result, 2, 1);
-                FloatTo(result, (ToFloat(Operand) != 0) ? 0 : 1);
-            }
-            else{
-                DataInit(result, 1, 0);
-                IntTo(result, (ToInt(Operand) != 0) ? 0 : 1);
-            }
+            DataInit(result, 1, 0);
+            IntTo(result, (ToInt(Operand) != 0) ? 0 : 1);
             return result;
         }
     }
@@ -452,12 +390,12 @@ Data* Run(Parser* parser, ExpressionNode* node){
             Data* RValue = Run(parser, bin->RNode);
             Data* result = malloc(sizeof(Data));
             if (LValue->Type == 1 || RValue->Type == 1){
-                DataInit(result, 2, 1);
-                FloatTo(result, (ToFloat(LValue) != 0) && (ToFloat(RValue) != 0) ? 1 : 0);
+                DataInit(result, 1, 2);
+                BoolTo(result, (ToFloat(LValue) != 0) && (ToFloat(RValue) != 0) ? 1 : 0);
             }
             else{
-                DataInit(result, 1, 0);
-                IntTo(result, (ToInt(LValue) != 0) && (ToInt(RValue) != 0) ? 1 : 0);
+                DataInit(result, 1, 2);
+                BoolTo(result, (ToInt(LValue) != 0) && (ToInt(RValue) != 0) ? 1 : 0);
             }
             return result;
         }
@@ -465,13 +403,12 @@ Data* Run(Parser* parser, ExpressionNode* node){
             Data* LValue = Run(parser, bin->LNode);
             Data* RValue = Run(parser, bin->RNode);
             Data* result = malloc(sizeof(Data));
+            DataInit(result, 1, 2);
             if (LValue->Type == 1 || RValue->Type == 1){
-                DataInit(result, 2, 1);
-                FloatTo(result, (ToFloat(LValue) != 0) || (ToFloat(RValue) != 0) ? 1 : 0);
+                BoolTo(result, (ToFloat(LValue) != 0) || (ToFloat(RValue) != 0) ? 1 : 0);
             }
             else{
-                DataInit(result, 1, 0);
-                IntTo(result, (ToInt(LValue) !=0 ) || (ToInt(RValue) != 0) ? 1 : 0);
+                BoolTo(result, (ToInt(LValue) != 0 ) || (ToInt(RValue) != 0) ? 1 : 0);
             }
             return result;
         }
@@ -479,13 +416,12 @@ Data* Run(Parser* parser, ExpressionNode* node){
             Data* LValue = Run(parser, bin->LNode);
             Data* RValue = Run(parser, bin->RNode);
             Data* result = malloc(sizeof(Data));
+            DataInit(result, 1, 2);
             if (LValue->Type == 1 || RValue->Type == 1){
-                DataInit(result, 2, 1);
-                FloatTo(result, (ToFloat(LValue) == ToFloat(RValue)) ? 1 : 0);
+                BoolTo(result, (ToFloat(LValue) == ToFloat(RValue)) ? 1 : 0);
             }
             else{
-                DataInit(result, 1, 0);
-                IntTo(result, (ToInt(LValue) == ToInt(RValue)) ? 1 : 0);
+                BoolTo(result, (ToInt(LValue) == ToInt(RValue)) ? 1 : 0);
             }
             return result;
         }
@@ -493,13 +429,12 @@ Data* Run(Parser* parser, ExpressionNode* node){
             Data* LValue = Run(parser, bin->LNode);
             Data* RValue = Run(parser, bin->RNode);
             Data* result = malloc(sizeof(Data));
+            DataInit(result, 1, 2);
             if (LValue->Type == 1 || RValue->Type == 1){
-                DataInit(result, 2, 1);
-                FloatTo(result, (ToFloat(LValue) > ToFloat(RValue)) ? 1 : 0);
+                BoolTo(result, (ToFloat(LValue) > ToFloat(RValue)) ? 1 : 0);
             }
             else{
-                DataInit(result, 1, 0);
-                IntTo(result, (ToInt(LValue) > ToInt(RValue)) ? 1 : 0);
+                BoolTo(result, (ToInt(LValue) > ToInt(RValue)) ? 1 : 0);
             }
             return result;
         }
@@ -507,13 +442,12 @@ Data* Run(Parser* parser, ExpressionNode* node){
             Data* LValue = Run(parser, bin->LNode);
             Data* RValue = Run(parser, bin->RNode);
             Data* result = malloc(sizeof(Data));
+            DataInit(result, 1, 2);
             if (LValue->Type == 1 || RValue->Type < 1){
-                DataInit(result, 2, 1);
-                FloatTo(result, (ToFloat(LValue) < ToFloat(RValue)) ? 1 : 0);
+                BoolTo(result, (ToFloat(LValue) < ToFloat(RValue)) ? 1 : 0);
             }
             else{
-                DataInit(result, 1, 0);
-                IntTo(result, (ToInt(LValue) < ToInt(RValue)) ? 1 : 0);
+                BoolTo(result, (ToInt(LValue) < ToInt(RValue)) ? 1 : 0);
             }
             return result;
         }
@@ -521,32 +455,7 @@ Data* Run(Parser* parser, ExpressionNode* node){
             Variable* var = (Variable*)(bin->LNode->Node);
             char* name = var->Var->Code;
             Data* result = Run(parser, bin->RNode);
-            unsigned int types = 0;
-            if (var->Type != NULL){
-                if (IsEqStr(var->Type->Code, "float") == 1){types = 1;}
-                else if(IsEqStr(var->Type->Code, "bool") == 1){types = 2;}
-                else if(IsEqStr(var->Type->Code, "char") == 1){types = 3;}
-                Data* type = malloc(sizeof(Data));
-                DataInit(type, 1, 0);
-                IntTo(type, types);
-                DictionaryAdd(parser->DictionaryVariable, type, name);
-            }else{
-                if(TryGetValue(parser->DictionaryVariable, name)){
-                    types = ToInt(GetValue(parser->DictionaryVariable, name));
-                }
-            }
-            if(types == 0){
-                DictionaryAdd(parser->ValueInt, result, name);
-            }
-            else if (types == 1){
-                DictionaryAdd(parser->ValueFloat, result, name);
-            }
-            else if (types == 2){
-                DictionaryAdd(parser->ValueBool, result, name);
-            }
-            else if (types == 3){
-                DictionaryAdd(parser->ValueChar, result, name);
-            }
+            DictionaryAdd(parser->DictionaryVariable, result, name);
             return result;
         }
     }
@@ -562,8 +471,11 @@ Data* Run(Parser* parser, ExpressionNode* node){
 
 void DelParser(Parser* parser){
     for (unsigned int i = 0; i < parser->LenTokens; i++){
-        free(parser->Tokens[i].Code); parser->Tokens[i].Code = NULL;
+        free(parser->Tokens[i].Code);
+        parser->Tokens[i].Code = NULL;
     }
-    free(parser->Tokens); parser->Tokens = NULL;
-    free(parser); parser = NULL;
+    free(parser->Tokens);
+    parser->Tokens = NULL;
+    free(parser);
+    parser = NULL;
 }

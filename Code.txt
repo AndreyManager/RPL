@@ -1,0 +1,2 @@
+loger = 5;
+log loger;

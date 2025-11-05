@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Match.c"
+//#include "Token.c"
+//#include "String.c"
 //extern TokenType tokenType[];
 
 
@@ -64,7 +66,7 @@ short NextToken(Lexer* lexer){
                 TokenInit(token, lexer->Pos, lexer->LenTokens, result, &type);
                 lexer->Tokens = realloc(lexer->Tokens, sizeof(Token) * (lexer->LenTokens+1));
                 if (lexer->Tokens != NULL){
-                    if (IsEqStr(token->Type.Name, tokenType[16].Name)){lexer->CountStrings++;}
+                    if (IsEqStr(token->Type.Name, tokenType[18].Name)){lexer->CountStrings++;}
                     lexer->Tokens[lexer->LenTokens++] = *token;
                     return 1;
                 }

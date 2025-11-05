@@ -45,6 +45,9 @@ char* Match(char* str, char* regis){
         while(str[ind] == regis[ind+1] && regis[ind+1] != '\0'){ind++;}
 
         if(ind == lenRegis-1){
+            if (IsIn(tokenType[20].Regex, str[ind+1]) && IsIn(tokenType[20].Regex, str[ind])){
+                return NULL;
+            }
             result = (char*)calloc(ind+1, sizeof(char));
             for(unsigned int i = 0; i < ind+1; i++){
                 result[i] = regis[i+1];

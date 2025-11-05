@@ -1,4 +1,5 @@
 #include "String.c"
+#include <stdio.h>
 
 
 typedef struct Data{
@@ -77,7 +78,13 @@ void TypeTo(Data* data, char* code){
     }
     unsigned int ind = 0;
     unsigned int len = 0;
-    for(unsigned int i = 0; code[i] != '\0'; i++){if(code[i] == '.'){ind = i;}len = i;}
+    for(unsigned int i = 0; code[i] != '\0'; i++){
+        if(code[i] == '.')
+        {
+            ind = i;
+        }
+        len = i;
+    }
     if(ind == 0){
         DataInit(data, 1, 0);
         IntTo(data, atoi(code));
@@ -87,7 +94,7 @@ void TypeTo(Data* data, char* code){
         DataInit(data, 2, 1);
         char num[len];
         for(unsigned int i = 0; i < len; i++){
-            num[i] = code[i + (i>=ind ? 1 : 0)];
+            num[i] = code[i + (i >= ind ? 1 : 0)]; // Jump point
         }
         data->Value[0] = atoi(num);
         data->Value[1] = len-ind;

@@ -39,10 +39,10 @@ void DictionaryAdd(Dictionary* dic, Data* value, char* key){
             }
         }
     }
+    // ERROR
     dic->NumArr[dic->Len] = *value;
     dic->StrArr[dic->Len].word = key;
     dic->Len++;
-    
 }
 
 Data* GetValue(Dictionary* dic, char* key){

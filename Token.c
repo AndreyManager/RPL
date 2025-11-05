@@ -1,3 +1,6 @@
+#include <stdio.h>
+
+
 typedef struct TokenType{
     char* Name;
     char* Regex;
@@ -54,10 +57,6 @@ TokenType tokenType[] = {
     {.Name = "false", .Regex = "/false"},                         // 17
     {.Name = "semicolon", .Regex = "/;"},                         // 18
     {.Name = "symbol", .Regex = "/'"},                            // 19
-    {.Name = "int", .Regex = "/int"},                             // 20
-    {.Name = "float", .Regex = "/float"},                         // 21
-    {.Name = "bool", .Regex = "/bool"},                           // 22
-    {.Name = "char", .Regex = "/char"},                           // 23
-    {.Name = "variable", .Regex = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"},  // 24
-    {.Name = "space", .Regex = " \n\t"}                           // 25
+    {.Name = "variable", .Regex = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"},  // 20
+    {.Name = "space", .Regex = " \n\t"}                           // 21
 };
