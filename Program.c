@@ -8,8 +8,8 @@
 int main(){
     char* myCode;
     FILE* file = fopen("code.txt", "r");
-    unsigned int len = 0;
-    if(file){
+    int len = 0;
+    if(file != NULL){
         fseek(file, 0, SEEK_END);
         len = ftell(file);
         fseek(file, 0, SEEK_SET);
@@ -42,11 +42,12 @@ int main(){
         if (nt == 0){break;}
         if (nt == -1){return 1;}
     }
-    // printf("%d\n", lexer.LenTokens);
-    // for(int i = 0; i < lexer.LenTokens; i++){
-    //     printf("%s\n", lexer.Tokens[i].Type.Name);
-    // }
-    // printf("\n\n");
+    
+    printf("%d\n", lexer.LenTokens);
+    for(int i = 0; i < lexer.LenTokens; i++){
+        printf("%s\n", lexer.Tokens[i].Type.Name);
+    }
+    printf("\n\n");
 
     Parser* parser = malloc(sizeof(Parser));
     if(parser == NULL){printf("Parser malloc error\n");return 1;}

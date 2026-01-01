@@ -1,2 +1,12 @@
-loger = 5;
-log loger;
+m = 0;
+a = 0;
+while = label;
+a = input;
+a = int a[0];
+if not (a > m);
+goto label + 1;
+m = int a;
+if not a < 1;
+goto while;
+log "answer: ";
+log m;

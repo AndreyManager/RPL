@@ -24,8 +24,8 @@ void LexerInit(Lexer* lexer, char* code){
 }
 
 char* subCode;
-char* SubStr(unsigned int pos, char* str){
-    unsigned int len = 0;
+char* SubStr(int pos, char* str){
+    int len = 0;
     while(str[len] != '\0'){len++;}
 
     subCode = (char*)calloc(len-pos, sizeof(char));
@@ -38,12 +38,12 @@ char* SubStr(unsigned int pos, char* str){
 }
 
 short NextToken(Lexer* lexer){
-    unsigned int lenCode = 0;
+    int lenCode = 0;
     while(lexer->Code[lenCode] != '\0'){lenCode++;}
     if (lexer->Pos >= lenCode){
         return 0;
     }
-    unsigned int lenType = sizeof(tokenType)/sizeof(tokenType[0]); 
+    int lenType = sizeof(tokenType)/sizeof(tokenType[0]); 
     for (int i = 0; i < lenType; i++){
         TokenType type = {tokenType[i].Name, tokenType[i].Regex};
         char* code = SubStr(lexer->Pos, lexer->Code);
@@ -56,6 +56,7 @@ short NextToken(Lexer* lexer){
         if (result != NULL){
             unsigned int lenResult = 0;
             while(result[lenResult] != '\0'){lenResult++;}
+            if (result[1] == '\n'){lenResult++;}
             //printf("%d _ %s\n", lenResult, result);
             if(lenResult == 0){continue;}
             lexer->Pos += lenResult;
@@ -66,7 +67,7 @@ short NextToken(Lexer* lexer){
                 TokenInit(token, lexer->Pos, lexer->LenTokens, result, &type);
                 lexer->Tokens = realloc(lexer->Tokens, sizeof(Token) * (lexer->LenTokens+1));
                 if (lexer->Tokens != NULL){
-                    if (IsEqStr(token->Type.Name, tokenType[18].Name)){lexer->CountStrings++;}
+                    if (IsEqStr(token->Type.Name, tokenType[Tsemicolon].Name)){lexer->CountStrings++;}
                     lexer->Tokens[lexer->LenTokens++] = *token;
                     return 1;
                 }

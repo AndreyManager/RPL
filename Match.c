@@ -11,24 +11,51 @@ int IsIn(char* str, char el){
 }
 char* result;
 char* Match(char* str, char* regis){
-    if(regis[1] == '\''){
+    if (regis[1] == '"'){
+        if (str[0] == '"'){
+            int ind = 1;
+            while (str[ind] != '"'){
+                ind++;
+                if (str[ind] == '\0'){
+                    result = malloc(sizeof(char));
+                    result[0] = '\0';
+                    return result;
+                } 
+            }
+            result = calloc(ind + 1, sizeof(char));
+            for(int i = 0; i <= ind; i++){
+                result[i] = str[i];
+            }
+            return result;
+        }
+        return NULL;
+    }
+    else if (regis[1] == '\''){
         if (str[0] == '\''){
+            if (str[1] == '\\'){
+                if (str[3] != '\''){return NULL;}
+                result = calloc(4, sizeof(char));
+                for(int i = 0; i < 4; i++){
+                    result[i] = str[i];
+                }
+                return result;
+            }
+            if (str[2] != '\''){return NULL;}
             result = calloc(4, sizeof(char));
-            result[0] = str[0];
-            result[1] = str[1];
-            result[2] = str[2];
-            result[3] = '\0';
+            for(int i = 0; i < 3; i++){
+                result[i] = str[i];
+            }
             return result;
         }
         return NULL;
     }
     else if (regis[0] != '/'){
-        unsigned int ind = 0;
+        int ind = 0;
         while (IsIn(regis, str[ind]) == 1){ind++;}
         
         if(ind != 0){
             result = (char*)calloc(ind+1, sizeof(char));
-            for(unsigned int i = 0; i < ind; i++){
+            for(int i = 0; i < ind; i++){
                 result[i] = str[i];
             }
             return result;
@@ -45,7 +72,7 @@ char* Match(char* str, char* regis){
         while(str[ind] == regis[ind+1] && regis[ind+1] != '\0'){ind++;}
 
         if(ind == lenRegis-1){
-            if (IsIn(tokenType[20].Regex, str[ind+1]) && IsIn(tokenType[20].Regex, str[ind])){
+            if (IsIn(tokenType[Tvar].Regex, str[ind+1]) && IsIn(tokenType[Tvar].Regex, str[ind])){
                 return NULL;
             }
             result = (char*)calloc(ind+1, sizeof(char));
