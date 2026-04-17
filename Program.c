@@ -55,7 +55,6 @@ int main(){
     ExpressionNode* rootNode = ParseCode(parser);
     Run(parser, rootNode);
 
-    printf("finish\n");
     DelRoot((StatementsNode*)(rootNode->Node));
     DelDic(parser->DictionaryVariable);
     DelParser(parser);
