@@ -43,11 +43,11 @@ int main(){
         if (nt == -1){return 1;}
     }
     
-    printf("%d\n", lexer.LenTokens);
-    for(int i = 0; i < lexer.LenTokens; i++){
-        printf("%s\n", lexer.Tokens[i].Type.Name);
-    }
-    printf("\n\n");
+    // printf("%d\n", lexer.LenTokens);
+    // for(int i = 0; i < lexer.LenTokens; i++){
+    //     printf("%s\n", lexer.Tokens[i].Type.Name);
+    // }
+    // printf("\n\n");
 
     Parser* parser = malloc(sizeof(Parser));
     if(parser == NULL){printf("Parser malloc error\n");return 1;}
@@ -55,9 +55,11 @@ int main(){
     ExpressionNode* rootNode = ParseCode(parser);
     Run(parser, rootNode);
 
+    printf("finish\n");
     DelRoot((StatementsNode*)(rootNode->Node));
     DelDic(parser->DictionaryVariable);
     DelParser(parser);
     getchar();
+
     return 0;
 }

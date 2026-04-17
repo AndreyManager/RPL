@@ -67,12 +67,13 @@ char* Match(char* str, char* regis){
     else{
         unsigned int lenRegis = 0;
         while(regis[lenRegis] != '\0'){lenRegis++;}
-
+        
         unsigned int ind = 0;
         while(str[ind] == regis[ind+1] && regis[ind+1] != '\0'){ind++;}
-
+        
         if(ind == lenRegis-1){
-            if (IsIn(tokenType[Tvar].Regex, str[ind+1]) && IsIn(tokenType[Tvar].Regex, str[ind])){
+            if (IsIn(tokenType[Tvar].Regex, str[ind+1]) && 
+                IsIn(tokenType[Tvar].Regex, str[ind]) && lenRegis != 2){
                 return NULL;
             }
             result = (char*)calloc(ind+1, sizeof(char));

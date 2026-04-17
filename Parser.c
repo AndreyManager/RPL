@@ -72,7 +72,7 @@ void ParserInit(Parser* parser, unsigned int lenTokens, Token* tokens){
             maxList++;
         }
     }
-    printf("Memory:\nCount Variables: %d\nCount List: %d\n\n", maxVariable, maxList);
+    // printf("Memory:\nCount Variables: %d\nCount List: %d\n\n", maxVariable, maxList);
 
     Data* fv = malloc(sizeof(Data));
     DataInit(fv, 1, 0);
@@ -104,7 +104,6 @@ Token* GetCurrentTokenIfIn(Parser* parser, unsigned int len, TokenType* types){
 void Requier(Parser* parser, unsigned int len, TokenType* types){
     Token* token = GetCurrentTokenIfIn(parser, len, types);
     if(token == NULL){
-        printf("F2\n");
         ThrowParser(parser, 1, &parser->Tokens[parser->Pos - 1], "Requier error");
         return;
     }
@@ -288,6 +287,7 @@ ExpressionNode* ParseParentheses(Parser* parser){
         return node;
     }
     else{
+        // printf("%s %s %d\n", parser->Tokens[parser->Pos].Type.Name, parser->Tokens[parser->Pos].Code, parser->Pos);
         return ParseVariableOrNumberOrOperation(parser);
     }
 }
@@ -332,7 +332,6 @@ ExpressionNode* ParseCurrentString(Parser* parser){
         if(GetCurrentTokenIfIn(parser, i, &not) == NULL){return ParseUnarOperation(parser, &not[i]);}
         parser->Pos--;
     }
-
     return ParseVariable(parser);
 }
 
@@ -442,10 +441,10 @@ Data* Run(Parser* parser, ExpressionNode* node){
             if(parser->IsCanGo == 1){
                 Data* Operand = Run(parser, unar.Operand);
                 if (Operand->Type == Vfloat){
-                    parser->NumberString = (int)ToFloat(Operand) - 1;
+                    parser->NumberString = (int)ToFloat(Operand) - 2;
                 }
                 else{
-                    parser->NumberString = ToInt(Operand) - 1;
+                    parser->NumberString = ToInt(Operand) - 2;
                 }
             }
             parser->IsCanGo = 1;

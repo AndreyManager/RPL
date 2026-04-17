@@ -52,7 +52,7 @@ short NextToken(Lexer* lexer){
         }
         char* result = Match(code, type.Regex);
         free(code);
-
+        
         if (result != NULL){
             unsigned int lenResult = 0;
             while(result[lenResult] != '\0'){lenResult++;}
