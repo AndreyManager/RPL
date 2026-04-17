@@ -1,0 +1,16 @@
+inp = input;
+log type inp;
+log '\n';
+n = 0;
+i = 0;
+while = label;
+if i == len inp;
+goto label + 5;
+d = inp[i];
+n = n + n + n + n + n + n + n + n + n + n + int d;
+i = i + 1;
+if i < len inp;
+goto while;
+log n;
+log '\n';
+log type n;
